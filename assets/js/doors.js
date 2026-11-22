@@ -127,7 +127,7 @@ if(modal){
 var list=PS.store.get('shortlist',[]).filter(byCode);
 var pill=$('#slPill'), drawer=$('#slDrawer');
 function save(){ PS.store.set('shortlist',list); render(); }
-function toggle(code){ var i=list.indexOf(code); if(i>-1) list.splice(i,1); else { list.push(code); bump(); } save(); }
+function toggle(code){ var i=list.indexOf(code); if(i>-1) list.splice(i,1); else { list.push(code); bump(); if(navigator.vibrate) try{navigator.vibrate([10,40,14])}catch(e){} } save(); }
 function bump(){ if(!pill) return; pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump'); }
 function syncAdd(){ var on=curCode&&list.indexOf(curCode)>-1, b=$('#mAdd'); if(b){ b.classList.toggle('on',!!on); b.querySelector('span').textContent=on?'Shortlisted':'Add to shortlist'; } }
 function msg(){ return 'Hi Ponsem Steels, please share price & availability for these steel doors:\n'+list.map(function(c){var d=byCode(c);return '• '+c+' – '+d.name+' ('+SERIES[d.s].name+')'}).join('\n'); }
@@ -192,7 +192,7 @@ if(sc && PS.initShowroom){
   var pick2=['CA-01','HT-01','AL-01','CP-01','CA-05','SM-801','HT-05','AL-03','CA-07','CP-02','SM-826','CA-06'];
   var list2=pick2.map(byCode);
   var api=PS.initShowroom(sc,list2,{
-    onChange:function(d){ var se=SERIES[d.s]; $('#srCode').textContent=d.code; $('#srName').textContent=d.name; $('#srSer').textContent=se.name+' · '+se.tag; $('#srSer').style.color=se.color; },
+    onChange:function(d,k,N){ var dots=$('#srDots'); if(dots){ if(dots.children.length!==N){ dots.innerHTML=new Array(N+1).join('<i></i>'); } $$('i',dots).forEach(function(x,i){x.classList.toggle('on',i===k)}); } var se=SERIES[d.s]; $('#srCode').textContent=d.code; $('#srName').textContent=d.name; $('#srSer').textContent=se.name+' · '+se.tag; $('#srSer').style.color=se.color; },
     onPick:function(code){ openModal(code); }
   });
   if(api){ $('#srPrev').addEventListener('click',api.prev); $('#srNext').addEventListener('click',api.next); $('#srView').addEventListener('click',function(){ openModal($('#srCode').textContent); }); }
@@ -229,5 +229,35 @@ if(dev){
   function run(m){ clear(); demos[m](); $$('.method').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-m')===m); }); }
   $$('.method').forEach(function(b){ b.addEventListener('click',function(){ run(b.getAttribute('data-m')); }) });
   new IntersectionObserver(function(es){ if(es[0].isIntersecting&&!seen){ seen=true; run('pin'); } },{threshold:.5}).observe(dev);
+}
+})();
+
+/* ---------- mobile delights ---------- */
+(function(){
+var PS=window.PS,$=PS.$,$$=PS.$$;
+var touch=matchMedia('(hover:none)').matches;
+/* doors breathe open as they scroll through the middle of the screen */
+if(touch && !PS.reduce && 'IntersectionObserver' in window){
+  var grid=$('#doorGrid');
+  if(grid){
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ e.target.classList.toggle('peek-open', e.isIntersecting); }); },{rootMargin:'-38% 0px -38% 0px'});
+    $$('.dcard',grid).forEach(function(c){ io.observe(c) });
+  }
+}
+/* modal: swipe between doors + tilt phone to view in 3D */
+var stage=$('#mStage'), img=$('#mImg');
+if(stage){
+  var sx=0, sy=0;
+  stage.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  stage.addEventListener('touchend',function(e){ var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){ (dx<0?$('#mNext'):$('#mPrev')).click(); } },{passive:true});
+  var gyroOn=false;
+  function onOri(e){ if($('#doorModal').hidden) return; var g=Math.max(-25,Math.min(25,e.gamma||0)), b=Math.max(-20,Math.min(20,(e.beta||45)-45)); img.style.transform='rotateY('+(g*0.9)+'deg) rotateX('+(-b*0.5)+'deg)'; stage.style.setProperty('--sx',(50+g*2)+'%'); stage.style.setProperty('--sy',(30+b*2)+'%'); }
+  function enableGyro(){ if(gyroOn||!touch||PS.reduce||!('DeviceOrientationEvent' in window)) return; 
+    if(typeof DeviceOrientationEvent.requestPermission==='function'){ DeviceOrientationEvent.requestPermission().then(function(s){ if(s==='granted'){ gyroOn=true; addEventListener('deviceorientation',onOri); var h=$('#gyroHint'); if(h) h.remove(); } }).catch(function(){}); }
+    else { gyroOn=true; addEventListener('deviceorientation',onOri); }
+  }
+  stage.addEventListener('click',enableGyro);
+  if(touch && typeof (window.DeviceOrientationEvent||{}).requestPermission!=='function') enableGyro();
+  if(touch){ var hint=document.createElement('div'); hint.className='m-hint'; hint.id='gyroHint'; hint.innerHTML='<span></span>Swipe for more · tilt your phone'; stage.appendChild(hint); }
 }
 })();

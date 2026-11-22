@@ -63,7 +63,7 @@ function makeSlab(tex, w, h, d, uv, edgeColor){
 }
 function onVisible(el, cb){ var v=true; if('IntersectionObserver' in window){ new IntersectionObserver(function(es){ v=es[0].isIntersecting; cb(v); }).observe(el); } return function(){return v}; }
 function fit(renderer, cam, host, after){
-  function size(){ var w=host.clientWidth, h=host.clientHeight; if(!w||!h) return; renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); if(after) after(w,h); }
+  function size(){ var el=renderer.domElement, w=el.clientWidth||host.clientWidth, h=el.clientHeight||host.clientHeight; if(!w||!h) return; renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); if(after) after(w,h); }
   size(); addEventListener('resize', size); return size;
 }
 function sparks(scene, N, box, size, color){
@@ -129,7 +129,8 @@ PS.initDoorHero = function(canvas, opts){
   var dust=sparks(rig, 160, [W*1.2,H*1.1,2.2,0.4], 0.05, 0xffd890);
 
   var mobile=false;
-  fit(renderer, cam, host, function(w){ mobile=w<760; rig.position.set(mobile?0:(w<1100?2.1:3.3), mobile?-0.6:-0.15, mobile?-2.5:0); rig.scale.setScalar(mobile?0.9:1); });
+  fit(renderer, cam, host, function(w){ mobile=innerWidth<760; rig.position.set(mobile?0:(w<1100?2.1:3.3), mobile?-0.05:-0.15, 0); rig.scale.setScalar(1); cam.fov=mobile?33:30; cam.updateProjectionMatrix(); });
+  var tapOpen=false; canvas.addEventListener('click',function(){ tapOpen=!tapOpen; if(navigator.vibrate) try{navigator.vibrate(12)}catch(e){} var h=document.getElementById('tapHint'); if(h) h.classList.add('gone'); });
   var mx=0,my=0,tx=0,ty=0;
   addEventListener('pointermove', function(e){ tx=(e.clientX/innerWidth-.5); ty=(e.clientY/innerHeight-.5); }, {passive:true});
   var visible=onVisible(host,function(){});
@@ -139,10 +140,11 @@ PS.initDoorHero = function(canvas, opts){
     if(visible()){
       intro=Math.min(1,intro+dt*0.45);
       var pin=host.parentElement, pinned=pin&&pin.classList.contains('hero-pin')&&getComputedStyle(host).position==='sticky';
-      var sp=pinned? Math.min(1,Math.max(0,-pin.getBoundingClientRect().top/Math.max(1,pin.offsetHeight-innerHeight))) : Math.min(1, Math.max(0, window.scrollY/(host.clientHeight*0.75)));
+      var cr=canvas.getBoundingClientRect();
+      var sp=pinned? Math.min(1,Math.max(0,-pin.getBoundingClientRect().top/Math.max(1,pin.offsetHeight-innerHeight))) : (mobile? Math.min(1,Math.max(0,(innerHeight*0.92-cr.top)/(cr.height*1.25)-0.15)) : Math.min(1, Math.max(0, window.scrollY/(host.clientHeight*0.75))));
       if(pinned) pin.style.setProperty('--sp',sp.toFixed(3));
       var teaser=0.16*(1-Math.pow(1-Math.max(0,(intro-0.25)/0.75),3)) + Math.sin(t*1.1)*0.012*intro;
-      var target=reduce?0.55:Math.max(teaser, sp*1.05);
+      var target=reduce?0.55:Math.max(teaser, sp*1.05, tapOpen?1.02:0);
       open+=(target-open)*Math.min(1,dt*4);
       var a=Math.min(1,open)*1.45;
       pivL.rotation.y=-a; pivR.rotation.y=a;
@@ -151,8 +153,8 @@ PS.initDoorHero = function(canvas, opts){
       spill.material.opacity=Math.min(1,open*1.3); beam.material.opacity=Math.min(.9,open*1.1);
       rebars.rotation.y=Math.sin(t*0.3)*0.15;
       mx+=(tx-mx)*0.05; my+=(ty-my)*0.05;
-      rig.rotation.y=-0.32*(mobile?0.3:1)+mx*0.18; rig.rotation.x=my*0.06;
-      var k=pinned?Math.pow(Math.max(0,sp-0.3)/0.7,1.4):0; cam.position.z=13-(pinned?k*6.4:sp*2.2); cam.position.x=rig.position.x*k*0.92; cam.position.y=0.2-my*0.4*(1-k); cam.lookAt(rig.position.x*(0.35+0.65*k),0,0); rig.rotation.y*= (1-k*0.85);
+      rig.rotation.y=(mobile?-0.12+Math.sin(t*0.4)*0.08:-0.32+mx*0.18); rig.rotation.x=my*0.06;
+      var k=pinned?Math.pow(Math.max(0,sp-0.3)/0.7,1.4):0; cam.position.z=(mobile?14.6:13)-(pinned?k*6.4:sp*(mobile?3.2:2.2)); cam.position.x=rig.position.x*k*0.92; cam.position.y=0.2-my*0.4*(1-k); cam.lookAt(rig.position.x*(0.35+0.65*k),0,0); rig.rotation.y*= (1-k*0.85);
       dust(dt*0.25,t);
       renderer.render(scene,cam);
     }
@@ -250,7 +252,7 @@ PS.initShowroom = function(canvas, doors, opts){
   var dust=sparks(scene, 140, [10,6,6,R], 0.045, 0xffe0a0);
 
   var mobile=false;
-  fit(renderer,cam,host,function(w){ mobile=w<760; cam.fov=mobile?44:34; cam.updateProjectionMatrix(); });
+  fit(renderer,cam,host,function(w){ mobile=w<760; cam.fov=mobile?42:34; cam.updateProjectionMatrix(); });
   var rot=0, target=0, vel=0, current=-1, drag=false, lx=0, moved=0, idle=0;
   function idx(){ var k=Math.round(-target/step)%N; return (k+N)%N; }
   function go(k){ var cur=-target/step, d=((k-cur)%N+N)%N; if(d>N/2) d-=N; target-=d*step; idle=0; }
@@ -270,9 +272,9 @@ PS.initShowroom = function(canvas, doors, opts){
     if(visible()){
       idle+=dt; if(!drag && !reduce && idle>4.2){ target-=step; idle=0; }
       rot+=(target-rot)*Math.min(1,dt*(drag?14:3.2)); ring.rotation.y=rot;
-      var k=idx(); if(k!==current){ current=k; if(opts.onChange) opts.onChange(doors[k], k); }
+      var k=idx(); if(k!==current){ current=k; if(opts.onChange) opts.onChange(doors[k], k, N); }
       items.forEach(function(o,i){ var a=i*step+rot, f=Math.cos(a); var s=0.82+0.22*Math.max(0,f); o.holder.scale.setScalar(s); });
-      cam.position.set(Math.sin(t*0.2)*0.25, mobile?1.35:1.25, R+(mobile?7.4:6.2)); cam.lookAt(0,1.05,R*0.35);
+      cam.position.set(Math.sin(t*0.2)*0.25, mobile?1.3:1.25, R+(mobile?6.9:6.2)); cam.lookAt(0,mobile?1.05:1.05,R*(mobile?0.42:0.35));
       spot.position.set(0,5.5,R+2.5); spot.target.position.set(0,0.8,R);
       dust(dt*0.3,t); renderer.render(scene,cam);
     }

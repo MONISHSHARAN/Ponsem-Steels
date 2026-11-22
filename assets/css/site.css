@@ -811,3 +811,123 @@ header.site.scrolled{background:rgba(11,12,14,.95);box-shadow:0 1px 0 rgba(226,1
   .dm-stage{min-height:0;height:42svh}
   .dm-acts{position:sticky;bottom:0;background:#fff;padding-top:10px}
 }
+
+/* =====================================================================
+   MOBILE EXPERIENCE (phones first)
+   ===================================================================== */
+.tap-hint,.sr-dots,.m-hint{display:none}
+.sr-dots{position:absolute;z-index:3;left:50%;transform:translateX(-50%);bottom:98px;gap:6px}
+.sr-dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.25);transition:all .4s var(--ease)}
+.sr-dots i.on{width:22px;background:var(--gold-2)}
+.swipe-hand{display:inline-block;width:18px;height:12px;border-radius:6px;border:1.5px solid currentColor;position:relative}
+.swipe-hand::after{content:"";position:absolute;top:2px;left:2px;width:5px;height:5px;border-radius:50%;background:var(--gold-2);animation:swipeDot 1.6s ease-in-out infinite}
+@keyframes swipeDot{50%{left:9px}}
+@media (max-width:760px){
+  /* --- full-screen menu --- */
+  .burger{position:relative;z-index:120}
+  .menu.open{position:fixed;inset:0;z-index:110;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:90px 28px 120px;border-radius:0;border:0;background:radial-gradient(600px 400px at 80% 10%,rgba(196,144,15,.25),transparent 60%),rgba(8,9,11,.98);backdrop-filter:blur(20px)}
+  .menu.open li{opacity:0;transform:translateY(18px);animation:menuIn .55s var(--ease) forwards}
+  .menu.open li:nth-child(2){animation-delay:.05s}.menu.open li:nth-child(3){animation-delay:.1s}.menu.open li:nth-child(4){animation-delay:.15s}.menu.open li:nth-child(5){animation-delay:.2s}.menu.open li:nth-child(6){animation-delay:.25s}
+  .menu.open a{font-family:var(--serif);font-size:38px;font-weight:600;padding:8px 4px;background:none!important;box-shadow:none!important;border-bottom:1px solid rgba(255,255,255,.06);border-radius:0;display:flex;align-items:center;justify-content:space-between}
+  .menu.open a::after{content:"→";font-family:var(--sans);font-size:20px;color:var(--gold-2)}
+  .menu.open a.cur{color:var(--gold-2)}
+  .menu.open .nv i{width:9px;height:9px}
+  @keyframes menuIn{to{opacity:1;transform:none}}
+  html:has(.menu.open){overflow:hidden}
+
+  /* --- home hero: text, then a live door stage you can tap --- */
+  .home-hero{min-height:0;padding-bottom:8px}
+  .home-hero .hero-inner{order:1;padding:104px 0 0}
+  .home-hero #hero3d{position:relative;order:2;inset:auto;width:100%;height:60svh;min-height:380px;max-height:560px;opacity:1;margin-top:-10px;touch-action:pan-y;cursor:pointer}
+  .home-hero .hero-stats{order:3}
+  .home-hero h1{font-size:clamp(38px,11vw,52px);margin:18px 0 14px}
+  .home-hero .hero-ctas{margin-top:24px}
+  .home-hero .hero-ctas .btn{flex:1 1 0;padding:14px 10px;font-size:14px}
+  .home-hero .scroll-cue{display:none}
+  .tap-hint{display:flex;position:absolute;z-index:3;left:50%;transform:translateX(-50%);bottom:132px;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;background:rgba(18,20,24,.7);border:1px solid rgba(226,181,74,.35);backdrop-filter:blur(10px);font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#f3e2b8;transition:opacity .5s;pointer-events:none}
+  .tap-hint span{width:10px;height:10px;border-radius:50%;background:var(--gold-2);box-shadow:0 0 0 0 rgba(226,181,74,.7);animation:tapPulse 1.6s infinite}
+  .tap-hint.gone{opacity:0}
+  @keyframes tapPulse{70%{box-shadow:0 0 0 12px rgba(226,181,74,0)}100%{box-shadow:0 0 0 0 rgba(226,181,74,0)}}
+  .hero::after{height:90px}
+
+  /* --- stats: swipeable chips --- */
+  .hero-stats .wrap{width:100%}
+  .stats-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding:0 20px 4px;border:0;background:none;backdrop-filter:none;border-radius:0;scrollbar-width:none}
+  .stats-row::-webkit-scrollbar{display:none}
+  .stat{flex:0 0 auto;min-width:168px;scroll-snap-align:start;border:1px solid var(--line)!important;border-radius:16px;background:rgba(18,20,24,.7);padding:14px 16px}
+  .stat b{font-size:19px}
+  .stat span{font-size:12px}
+
+  /* --- rhythm --- */
+  .sec{padding:72px 0}
+  .sec-head h2{font-size:clamp(30px,8.6vw,40px)}
+  .sec-head p{font-size:16px}
+  .band{padding-bottom:72px}
+  .marquee{padding:16px 0}
+
+  /* --- divisions as a swipe deck --- */
+  .divisions{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -20px;padding:0 20px 10px;scrollbar-width:none}
+  .divisions::-webkit-scrollbar{display:none}
+  .div-card{flex:0 0 86%;scroll-snap-align:center;min-height:470px}
+  .div-card h3{font-size:34px}
+
+  /* --- door strip bigger, snappier --- */
+  .sd{flex-basis:64%}
+  .sd-img{height:260px}
+
+  /* --- showroom --- */
+  .showroom-hero h1{font-size:clamp(36px,10.5vw,48px)}
+  .showroom-hero .lead{font-size:15px;padding:0 6px}
+  .sr-stage{min-height:62svh}
+  .sr-dots{display:flex}
+  .sr-ui{bottom:22px;width:calc(100% - 32px);justify-content:space-between}
+  .sr-hint{top:2px}
+
+  /* --- catalogue cards breathe open while scrolling --- */
+  .dcard.peek-open .leaf.solo{transform:rotateY(-24deg);filter:brightness(.9)}
+  .dcard.peek-open .leaf.l:not(.solo){transform:rotateY(-26deg);filter:brightness(.9)}
+  .dcard.peek-open .leaf.r{transform:rotateY(26deg);filter:brightness(.9)}
+  .dcard.peek-open .portal .glow{opacity:.9}
+  .dcard.peek-open{box-shadow:0 18px 40px -22px rgba(196,144,15,.55);border-color:rgba(196,144,15,.35)}
+  .filters{margin:0 -12px;padding:0 12px 2px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+
+  /* --- modal becomes a bottom sheet --- */
+  .dmodal{padding:0;place-items:end stretch}
+  .dm-box{border-radius:26px 26px 0 0;max-height:94svh;transform:translateY(100%);transition:transform .5s var(--ease)}
+  .dmodal.show .dm-box{transform:none}
+  .dm-box::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.4);z-index:4}
+  .dm-stage{height:46svh;min-height:0;padding:26px 16px 50px}
+  .dm-stage img{max-height:100%}
+  .m-hint{display:flex;position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:2;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#e9dcc0;white-space:nowrap}
+  .m-hint span{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--gold-2);animation:tapPulse 1.6s infinite}
+  .dm-nav{inset:auto 10px 50%;transform:translateY(50%)}
+  .dm-nav button{width:38px;height:38px}
+  .dm-close{top:14px;right:14px;background:rgba(255,255,255,.9)}
+  .dm-info{padding:22px 20px 0}
+  .dm-info h3{font-size:30px}
+  .dm-acts{position:sticky;bottom:0;background:#fff;padding:12px 0 calc(12px + env(safe-area-inset-bottom));margin:0 -20px;padding-left:20px;padding-right:20px;border-top:1px solid rgba(22,24,28,.08);box-shadow:0 -12px 24px -16px rgba(0,0,0,.25)}
+  .dm-acts .btn{flex:1 1 40%;padding:13px 10px;font-size:14px}
+  #mForm{flex-basis:100%}
+
+  /* --- bottom action bar: premium glass --- */
+  .mbar{bottom:calc(10px + env(safe-area-inset-bottom));border-radius:22px;padding:7px;box-shadow:0 16px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+  .mbar a{padding:13px 6px;border-radius:16px}
+  .mbar a:active{transform:scale(.96)}
+  .sl-pill{bottom:calc(88px + env(safe-area-inset-bottom))}
+
+  /* --- smart lock & anatomy compact --- */
+  .lock-dev{width:min(250px,70%)}
+  .smart-grid,.anat-grid{gap:34px}
+}
+@media (max-width:760px) and (prefers-reduced-motion:reduce){ .menu.open li{opacity:1;transform:none;animation:none} }
+@media (max-width:760px){
+  .showroom-hero{padding-bottom:84px}
+  .sr-stage{min-height:56svh}
+  .sr-dots{bottom:96px}
+  .div-card::before{background:linear-gradient(180deg,rgba(8,9,11,.05) 0%,rgba(8,9,11,.7) 38%,rgba(8,9,11,.96) 66%)}
+  .div-card .art .stack{inset:0 0 50% 0}
+  #mWa{flex-basis:100%}
+  #mAdd,#mForm{flex:1 1 40%}
+}
+@media (max-width:760px){ .sr-info small{font-size:10px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;margin:0 auto} .sr-info{min-width:0;flex:1} }
