@@ -24,7 +24,7 @@
 <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/site.css?v=87463f37">
+<link rel="stylesheet" href="../assets/css/site.css?v=6f64d5fe">
 <noscript><style>.reveal,.fade-up{opacity:1!important;transform:none!important}.hero h1 .line>span{transform:none!important}#loader{display:none}</style></noscript>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://ponsemsteels.com/#organization","name":"Ponsem Steels","alternateName":["Ponsem Steel","PonsemSteels"],"url":"https://ponsemsteels.com/","logo":{"@type":"ImageObject","url":"https://ponsemsteels.com/assets/img/logo-square.png","width":600,"height":600},"image":"https://ponsemsteels.com/assets/img/og-image.jpg","email":"ponsemsteels@gmail.com","telephone":"+91-9345029544","description":"Ponsem Steels supplies premium TMT reinforcement bars (NADI 550D, MS LIFE 600+ CRS, VIZAG) and designer steel doors: GI steel, cast iron, aluminium and smart-lock doors.","contactPoint":[{"@type":"ContactPoint","telephone":"+91-9345029544","contactType":"sales","email":"ponsemsteels@gmail.com","areaServed":"IN","availableLanguage":["English"]}],"knowsAbout":["TMT bars","Fe 550D TMT bars","Corrosion resistant steel","Steel doors","GI steel doors","Cast iron doors","Aluminium doors","Smart lock doors"]},{"@type":"WebSite","@id":"https://ponsemsteels.com/#website","url":"https://ponsemsteels.com/","name":"Ponsem Steels","inLanguage":"en-IN","publisher":{"@id":"https://ponsemsteels.com/#organization"}},{"@type":"WebPage","@id":"https://ponsemsteels.com/tmt-bars/#webpage","url":"https://ponsemsteels.com/tmt-bars/","name":"TMT Bars | Ponsem Steels","isPartOf":{"@id":"https://ponsemsteels.com/#website"},"inLanguage":"en-IN"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://ponsemsteels.com/"},{"@type":"ListItem","position":2,"name":"TMT Bars","item":"https://ponsemsteels.com/tmt-bars/"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does \"D\" mean in 550D?","acceptedAnswer":{"@type":"Answer","text":"\"D\" stands for higher ductility. Under IS 1786, D-grade bars must meet stricter requirements for elongation and the ratio of tensile to yield strength. That means they stretch and bend more before failing, which is why they're preferred in earthquake-prone areas."}},{"@type":"Question","name":"What is CRS steel and when do I need it?","acceptedAnswer":{"@type":"Answer","text":"CRS means Corrosion Resistant Steel. Small alloying additions slow down rusting of the bar inside concrete. It's recommended for coastal regions, high-humidity areas, basements, sumps, water tanks and any structure regularly exposed to moisture. MS LIFE 600+ CRS is our choice for these conditions."}},{"@type":"Question","name":"How can I check that the steel is genuine?","acceptedAnswer":{"@type":"Answer","text":"Genuine branded TMT bars carry the brand name and grade rolled or embossed along the bar, plus the ISI mark. For VIZAG, for example, look for the embossed \"VIZAG\" marking. Always buy from a dealer you trust, and ask for a proper invoice."}},{"@type":"Question","name":"Why does the price of TMT bars change so often?","acceptedAnswer":{"@type":"Answer","text":"Steel prices follow raw-material costs and market demand, so rates can move daily. That's why we quote on the day. Message us on WhatsApp for the current price for your brand, size and quantity."}},{"@type":"Question","name":"Which sizes do you supply?","acceptedAnswer":{"@type":"Answer","text":"TMT bars are commonly used in 8, 10, 12, 16, 20, 25 and 32 mm diameters. Availability depends on the brand and grade, so tell us your bar schedule and we'll confirm what's in stock."}},{"@type":"Question","name":"Do you deliver to my site?","acceptedAnswer":{"@type":"Answer","text":"Yes, we arrange delivery to your site. Share your location and required date with your enquiry and we'll confirm the delivery schedule along with your quote."}},{"@type":"Question","name":"How much steel does my house need?","acceptedAnswer":{"@type":"Answer","text":"The exact quantity comes from your structural drawings and bar bending schedule. Use our calculator above to convert bar counts to weight, or send us your drawings and we'll help you plan the order."}}]}]}</script>
 </head>
@@ -198,11 +198,11 @@
       <p class="reveal" data-d="2">Pick what you're building and see our suggestion. Your structural engineer's specification always comes first. We'll match it exactly.</p>
     </div>
     <div class="advisor">
-      <div class="opts reveal" role="tablist">
-        <button class="opt on" data-k="home" role="tab"><span class="oi"><svg><use href="#i-home"/></svg></span><span><b>Individual house / villa</b><span>G+1 to G+3 residential</span></span></button>
-        <button class="opt" data-k="multi" role="tab"><span class="oi"><svg><use href="#i-building"/></svg></span><span><b>Apartments &amp; commercial</b><span>Multi-storey, heavy loads</span></span></button>
-        <button class="opt" data-k="coast" role="tab"><span class="oi"><svg><use href="#i-wave"/></svg></span><span><b>Coastal / humid / water-exposed</b><span>Sea air, sumps, tanks, basements</span></span></button>
-        <button class="opt" data-k="infra" role="tab"><span class="oi"><svg><use href="#i-bridge"/></svg></span><span><b>Infrastructure &amp; industrial</b><span>Bridges, factories, public works</span></span></button>
+      <div class="opts reveal" role="group" aria-label="Project type">
+        <button class="opt on" data-k="home" aria-pressed="true"><span class="oi"><svg><use href="#i-home"/></svg></span><span><b>Individual house / villa</b><span>G+1 to G+3 residential</span></span></button>
+        <button class="opt" data-k="multi" aria-pressed="false"><span class="oi"><svg><use href="#i-building"/></svg></span><span><b>Apartments &amp; commercial</b><span>Multi-storey, heavy loads</span></span></button>
+        <button class="opt" data-k="coast" aria-pressed="false"><span class="oi"><svg><use href="#i-wave"/></svg></span><span><b>Coastal / humid / water-exposed</b><span>Sea air, sumps, tanks, basements</span></span></button>
+        <button class="opt" data-k="infra" aria-pressed="false"><span class="oi"><svg><use href="#i-bridge"/></svg></span><span><b>Infrastructure &amp; industrial</b><span>Bridges, factories, public works</span></span></button>
       </div>
       <div class="rec reveal" data-d="1" aria-live="polite">
         <div class="swap" id="recBody"></div>
@@ -267,7 +267,7 @@
         <p>Choose a diameter and enter your quantity.</p>
         <span class="fl">Diameter (mm)</span>
         <div class="dia" id="dia">
-          <button data-d="8">8</button><button data-d="10">10</button><button data-d="12" class="on">12</button><button data-d="16">16</button><button data-d="20">20</button><button data-d="25">25</button><button data-d="32">32</button>
+          <button data-d="8">8</button><button data-d="10">10</button><button data-d="12" class="on" aria-pressed="true">12</button><button data-d="16">16</button><button data-d="20">20</button><button data-d="25">25</button><button data-d="32">32</button>
         </div>
         <div class="row2">
           <div class="field"><label class="fl" for="cLen">Length per bar (m)</label><input class="inp" id="cLen" type="number" min="0.5" step="0.5" value="12"></div>
@@ -401,8 +401,8 @@
   <a class="m-q" href="#contact">Get Quote</a>
 </nav>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="../assets/js/site.js?v=87463f37"></script>
-<script src="../assets/js/three-scenes.js?v=87463f37"></script>
-<script src="../assets/js/tmt.js?v=87463f37"></script>
+<script src="../assets/js/site.js?v=6f64d5fe"></script>
+<script src="../assets/js/three-scenes.js?v=6f64d5fe"></script>
+<script src="../assets/js/tmt.js?v=6f64d5fe"></script>
 </body>
 </html>

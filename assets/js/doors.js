@@ -55,9 +55,9 @@ function card(d,i){
   var se=SERIES[d.s], lv;
   if(d.leaves===2){
     var sp=(d.split*100).toFixed(1);
-    lv='<span class="leaf l" style="width:'+sp+'%;background-image:url('+d.img+');background-size:'+(10000/d.split/100).toFixed(1)+'% 100%;background-position:0 0"></span>'+
-       '<span class="leaf r" style="width:'+(100-sp).toFixed(1)+'%;background-image:url('+d.img+');background-size:'+(10000/(1-d.split)/100).toFixed(1)+'% 100%;background-position:100% 0"></span>';
-  } else lv='<span class="leaf l solo" style="background-image:url('+d.img+')"></span>';
+    lv='<span class="leaf l" data-bg="'+d.img+'" style="width:'+sp+'%;background-size:'+(10000/d.split/100).toFixed(1)+'% 100%;background-position:0 0"></span>'+
+       '<span class="leaf r" data-bg="'+d.img+'" style="width:'+(100-sp).toFixed(1)+'%;background-size:'+(10000/(1-d.split)/100).toFixed(1)+'% 100%;background-position:100% 0"></span>';
+  } else lv='<span class="leaf l solo" data-bg="'+d.img+'"></span>';
   return '<article class="dcard reveal" data-s="'+d.s+'" data-code="'+d.code+'" style="--sc:'+se.color+';transition-delay:'+(i%4*0.06)+'s">'+
     '<button class="dopen" aria-label="View '+d.code+' '+PS.esc(d.name)+'"><span class="portal"><span class="glow"></span><span class="peek">View<br><b>'+d.code+'</b></span>'+lv+'</span></button>'+
     '<div class="dmeta"><span class="dcode">'+d.code+'</span><span class="dser">'+se.name+'</span></div>'+
@@ -73,6 +73,8 @@ var grid=$('#doorGrid');
 if(grid){
   grid.innerHTML=DOORS.map(card).join('');
   PS.bindWa(grid); PS.reveal(grid);
+  var lz=function(el){ $$('[data-bg]',el).forEach(function(x){ x.style.backgroundImage='url('+x.getAttribute('data-bg')+')'; x.removeAttribute('data-bg'); }); };
+  if('IntersectionObserver' in window){ var lio=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ lz(e.target); lio.unobserve(e.target); } }); },{rootMargin:'600px 0px'}); $$('.dcard',grid).forEach(function(c){ lio.observe(c) }); } else lz(grid);
   var filt='all', q='';
   function apply(){
     var n=0; $$('.dcard',grid).forEach(function(c){ var d=byCode(c.getAttribute('data-code'));
@@ -93,7 +95,7 @@ var modal=$('#doorModal'), curCode=null, lastFocus=null;
 function visibleList(){ var v=grid? $$('.dcard:not([hidden])',grid).map(function(c){return c.getAttribute('data-code')}):[]; return v.length?v:DOORS.map(function(d){return d.code}); }
 function openModal(code){
   if(!modal) return; var d=byCode(code); if(!d) return; curCode=code; var se=SERIES[d.s];
-  lastFocus=document.activeElement;
+  if(modal.hidden) lastFocus=document.activeElement;
   $('#mImg').src=d.img; $('#mImg').alt=d.code+' – '+d.name+' steel door';
   $('#mSer').textContent=se.name+' · '+se.tag; $('#mSer').style.color=se.color;
   $('#mCode').textContent=d.code; $('#mName').textContent=d.name; $('#mLine').textContent=se.line;
@@ -143,10 +145,13 @@ document.addEventListener('click',function(e){
   var a=e.target.closest('[data-add]'); if(a){ e.preventDefault(); toggle(a.getAttribute('data-add')); return; }
   var r=e.target.closest('[data-rm]'); if(r){ toggle(r.getAttribute('data-rm')); return; }
 });
+function openDrawer(){ drawer.classList.add('show'); drawer.setAttribute('aria-hidden','false'); setTimeout(function(){ $('.sl-x',drawer).focus(); },60); }
+function closeDrawer(back){ if(!drawer.classList.contains('show')) return; drawer.classList.remove('show'); drawer.setAttribute('aria-hidden','true'); if(back!==false && !pill.hidden) pill.focus(); }
 if(pill){
-  pill.addEventListener('click',function(){ drawer.classList.add('show'); drawer.setAttribute('aria-hidden','false'); });
-  $$('[data-sl-close]').forEach(function(b){ b.addEventListener('click',function(){ drawer.classList.remove('show'); drawer.setAttribute('aria-hidden','true'); }) });
-  $('#slForm').addEventListener('click',function(){ drawer.classList.remove('show'); var sel=$('#fBrand'); if(sel) sel.value='Steel Doors'; var m=$('#fMsg'); if(m) m.value=msg().replace(/^Hi Ponsem Steels, /,''); });
+  pill.addEventListener('click',openDrawer);
+  $$('[data-sl-close]').forEach(function(b){ b.addEventListener('click',function(){ closeDrawer(); }) });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeDrawer(); });
+  $('#slForm').addEventListener('click',function(){ closeDrawer(false); var sel=$('#fBrand'); if(sel) sel.value='Steel Doors'; var m=$('#fMsg'); if(m) m.value=msg().replace(/^Hi Ponsem Steels, /,''); });
   $('#slClear').addEventListener('click',function(){ list=[]; save(); });
 }
 render();
@@ -158,7 +163,7 @@ if(sf){
   function val(id){ return parseFloat($('#'+id).value)||0; }
   function toMM(v){ return unit==='mm'?v:v*304.8; }
   function run(){
-    var H=toMM(val('sfH')), W=toMM(val('sfW')), out=$('#sfOut');
+    var H=mmStore.sfH, W=mmStore.sfW, out=$('#sfOut');
     if(!H||!W){ out.innerHTML='<p class="sf-hint">Enter your door opening height and width to see matching designs.</p>'; return; }
     var hits=[];
     DOORS.forEach(function(d){ if(d.custom) return; var best=null; d.sizes.forEach(function(z){ var dh=Math.abs(z.h-H), dw=Math.abs(z.w-W); if(dh<=120&&dw<=100){ var sc=dh+dw; if(!best||sc<best.sc) best={z:z,sc:sc}; } }); if(best) hits.push({d:d,z:best.z,sc:best.sc}); });
@@ -168,9 +173,11 @@ if(sf){
       : '<p class="sf-hint">No standard catalogue size is that close, but our <b>Iconic</b> and <b>Smart</b> series are made to your exact size.</p>';
     out.innerHTML=head+body+'<p class="sf-custom"><svg><use href="#i-ruler"/></svg> Iconic & Smart Series doors are 100% customisable. Any size can be made to order.</p>';
   }
-  $$('#sfUnit button').forEach(function(b){ b.addEventListener('click',function(){ if(b.classList.contains('on')) return; var nu=b.getAttribute('data-u'); ['sfH','sfW'].forEach(function(id){ var el=$('#'+id), v=parseFloat(el.value); if(v){ el.value = nu==='ft' ? (v/304.8).toFixed(2) : Math.round(v*304.8); } el.step = nu==='ft'?'0.05':'10'; });
+  var mmStore={sfH:2050,sfW:1080};
+  ['sfH','sfW'].forEach(function(id){ $('#'+id).addEventListener('input',function(){ var v=parseFloat(this.value)||0; mmStore[id]=unit==='mm'?v:v*304.8; }); });
+  $$('#sfUnit button').forEach(function(b){ b.addEventListener('click',function(){ if(b.classList.contains('on')) return; var nu=b.getAttribute('data-u'); ['sfH','sfW'].forEach(function(id){ var el=$('#'+id), v=mmStore[id]; if(v){ el.value = nu==='ft' ? (v/304.8).toFixed(2) : Math.round(v); } el.step = nu==='ft'?'0.05':'10'; });
     unit=nu; $$('#sfUnit button').forEach(function(x){x.classList.toggle('on',x===b); x.setAttribute('aria-pressed',x===b)}); run(); }) });
-  $$('[data-preset]').forEach(function(b){ b.addEventListener('click',function(){ var p=b.getAttribute('data-preset').split('x'); if(unit==='ft'){ $('#sfH').value=(p[0]/304.8).toFixed(2); $('#sfW').value=(p[1]/304.8).toFixed(2);} else { $('#sfH').value=p[0]; $('#sfW').value=p[1]; } run(); }) });
+  $$('[data-preset]').forEach(function(b){ b.addEventListener('click',function(){ var p=b.getAttribute('data-preset').split('x'); mmStore.sfH=+p[0]; mmStore.sfW=+p[1]; if(unit==='ft'){ $('#sfH').value=(p[0]/304.8).toFixed(2); $('#sfW').value=(p[1]/304.8).toFixed(2);} else { $('#sfH').value=p[0]; $('#sfW').value=p[1]; } run(); }) });
   ['sfH','sfW'].forEach(function(id){ $('#'+id).addEventListener('input',run) });
   sf.addEventListener('click',function(e){ var v=e.target.closest('[data-view]'); if(v) openModal(v.getAttribute('data-view')); });
   run();
@@ -184,19 +191,22 @@ if(strip){
   strip.innerHTML=pick.map(function(c){ var d=byCode(c); return '<a class="sd" href="'+href+'#d-'+c+'" style="--sc:'+SERIES[d.s].color+'"><span class="sd-img"><img src="'+d.img+'" alt="'+c+' '+PS.esc(d.name)+'" loading="lazy"></span><b>'+c+'</b><span>'+PS.esc(d.name)+'</span><span style="color:'+SERIES[d.s].color+';font-weight:700;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase">'+SERIES[d.s].name+'</span></a>'; }).join('');
 }
 /* deep link #d-CODE */
-if(modal && /^#d-/.test(location.hash)){ var c=decodeURIComponent(location.hash.slice(3)); setTimeout(function(){ openModal(c) },700); }
+function deep(){ if(modal && /^#d-/i.test(location.hash)){ var c=decodeURIComponent(location.hash.slice(3)).toUpperCase(); setTimeout(function(){ openModal(c) },400); } }
+deep(); addEventListener('hashchange',deep);
 
 /* ---------- showroom ---------- */
 var sc=$('#showroom3d');
 if(sc && PS.initShowroom){
   var pick2=['CA-01','HT-01','AL-01','CP-01','CA-05','SM-801','HT-05','AL-03','CA-07','CP-02','SM-826','CA-06'];
   var list2=pick2.map(byCode);
+  PS.whenIdle(function(){
   var api=PS.initShowroom(sc,list2,{
     onChange:function(d,k,N){ var dots=$('#srDots'); if(dots){ if(dots.children.length!==N){ dots.innerHTML=new Array(N+1).join('<i></i>'); } $$('i',dots).forEach(function(x,i){x.classList.toggle('on',i===k)}); } var se=SERIES[d.s]; $('#srCode').textContent=d.code; $('#srName').textContent=d.name; $('#srSer').textContent=se.name+' · '+se.tag; $('#srSer').style.color=se.color; },
     onPick:function(code){ openModal(code); }
   });
   if(api){ $('#srPrev').addEventListener('click',api.prev); $('#srNext').addEventListener('click',api.next); $('#srView').addEventListener('click',function(){ openModal($('#srCode').textContent); }); }
   else { document.documentElement.classList.add('no-webgl'); }
+  });
 }
 })();
 /* ---------- anatomy + smart lock demo ---------- */

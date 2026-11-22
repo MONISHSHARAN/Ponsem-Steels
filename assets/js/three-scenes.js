@@ -257,7 +257,7 @@ PS.initShowroom = function(canvas, doors, opts){
   function idx(){ var k=Math.round(-target/step)%N; return (k+N)%N; }
   function go(k){ var cur=-target/step, d=((k-cur)%N+N)%N; if(d>N/2) d-=N; target-=d*step; idle=0; }
   var api={ next:function(){target-=step;idle=0}, prev:function(){target+=step;idle=0}, go:function(code){ var k=doors.findIndex(function(d){return d.code===code}); if(k>=0) go(Math.round(-target/step)+(((k-Math.round(-target/step))%N)+N)%N - ( (((k-Math.round(-target/step))%N)+N)%N > N/2 ? N:0)); } };
-  host.addEventListener('pointerdown',function(e){drag=true;lx=e.clientX;moved=0;host.setPointerCapture&&host.setPointerCapture(e.pointerId)});
+  host.addEventListener('pointerdown',function(e){ if(e.target.closest('.sr-ui,button,a')) return; drag=true;lx=e.clientX;moved=0;host.setPointerCapture&&host.setPointerCapture(e.pointerId)});
   host.addEventListener('pointermove',function(e){ if(!drag) return; var dx=e.clientX-lx; lx=e.clientX; moved+=Math.abs(dx); target+=dx*0.006; idle=0; });
   host.addEventListener('pointerup',function(e){ if(!drag) return; drag=false; target=Math.round(target/step)*step;
     if(moved<6){ // click

@@ -24,8 +24,9 @@ var yr=$('#yr'); if(yr) yr.textContent=new Date().getFullYear();
 
 /* Loader */
 function ready(){ var l=$('#loader'); if(l) l.classList.add('done'); document.body.classList.add('ready'); }
-window.addEventListener('load', function(){ setTimeout(ready, 350) });
-setTimeout(ready, 3000);
+if(document.readyState!=='loading') setTimeout(ready,250); else document.addEventListener('DOMContentLoaded', function(){ setTimeout(ready, 250) });
+setTimeout(ready, 2500);
+PS.whenIdle=function(fn){ var go=function(){ (window.requestIdleCallback||function(f){setTimeout(f,60)})(fn,{timeout:900}); }; if(document.readyState==='complete') go(); else addEventListener('load',go); };
 
 /* Header / progress / active nav / to-top */
 var header=$('header.site'), prog=$('#progress'), toTop=$('#toTop');
@@ -110,7 +111,7 @@ var form=$('#enquiry');
 if(form){
   var st=$('#fStatus'), sendBtn=$('#fSend');
   var F=function(n){return form.elements[n]};
-  var setBad=function(id, bad){ $('#'+id).closest('.fgroup').classList.toggle('bad', !!bad); return !!bad; };
+  var setBad=function(id, bad){ var el=$('#'+id), g=el.closest('.fgroup'), er=$('.err',g); g.classList.toggle('bad', !!bad); el.setAttribute('aria-invalid', bad?'true':'false'); if(er){ er.id=id+'Err'; el.setAttribute('aria-describedby', er.id); } return !!bad; };
   form.addEventListener('submit', function(e){
     e.preventDefault();
     if(F('_honey').value) return;

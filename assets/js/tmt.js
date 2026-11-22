@@ -30,11 +30,11 @@ var recBody=$('#recBody'), recWa=$('#recWa');
 function showRec(k, instant){
   var r=REC[k];
   var html='<span class="lbl">Our recommendation</span><h3>'+r.brand+'</h3><p class="why">'+r.why+'</p><ul>'+r.pts.map(function(p){return '<li>'+p+'</li>'}).join('')+'</ul><p style="font-size:14px;color:#9aa0aa;margin:-12px 0 26px;position:relative">'+r.alt+'</p>';
-  recWa.href=waLink('Hi Ponsem Steels, I need '+r.brand+' TMT bars for my project. Please share the price.');
+  recWa.href=waLink('Hi Ponsem Steels, I need '+r.brand.replace(/ TMT$/,'')+' TMT bars for my project. Please share the price.');
   if(instant){recBody.innerHTML=html;return}
   recBody.classList.add('out'); setTimeout(function(){recBody.innerHTML=html; recBody.classList.remove('out')}, 250);
 }
-$$('.opt').forEach(function(o){ o.addEventListener('click', function(){ $$('.opt').forEach(function(x){x.classList.remove('on')}); o.classList.add('on'); showRec(o.getAttribute('data-k')); }) });
+$$('.opt').forEach(function(o){ o.addEventListener('click', function(){ $$('.opt').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false')}); o.classList.add('on'); o.setAttribute('aria-pressed','true'); showRec(o.getAttribute('data-k')); }) });
 showRec('home', true);
 
 /* Calculator */
@@ -43,15 +43,15 @@ function fmt(n,d){return n.toLocaleString('en-IN',{maximumFractionDigits:d,minim
 function calc(){
   var L=Math.max(0, parseFloat($('#cLen').value)||0), N=Math.max(0, parseInt($('#cNum').value,10)||0);
   var pm=dia*dia/162, pb=pm*L, tot=pb*N;
-  $('#cKg').textContent=fmt(tot,1); $('#cT').textContent=fmt(tot/1000,3)+' tonnes ('+N+' bars × '+L+' m of '+dia+' mm)';
+  $('#cKg').textContent=fmt(tot,1); $('#cT').textContent=fmt(tot/1000,3)+' tonnes ('+N+(N===1?' bar':' bars')+' × '+L+' m of '+dia+' mm)'; $('#cWa').classList.toggle('disabled', !(tot>0)); $('#cWa').setAttribute('aria-disabled', !(tot>0));
   $('#cPm').textContent=fmt(pm,3); $('#cPb').textContent=fmt(pb,2);
   $('#cWa').href=waLink('Hi Ponsem Steels, I need '+N+' bars of '+dia+' mm TMT ('+L+' m each), about '+fmt(tot/1000,2)+' tonnes. Please share the price.');
 }
-$$('#dia button').forEach(function(b){ b.addEventListener('click', function(){ $$('#dia button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on'); dia=+b.getAttribute('data-d'); calc(); }) });
+$$('#dia button').forEach(function(b){ b.addEventListener('click', function(){ $$('#dia button').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false')}); b.classList.add('on'); b.setAttribute('aria-pressed','true'); dia=+b.getAttribute('data-d'); calc(); }) });
 $('#cLen').addEventListener('input', calc); $('#cNum').addEventListener('input', calc); calc();
 
 
 PS.bindWa(document);
-if(PS.initRebarHero) PS.initRebarHero($('#hero3d'));
-if(PS.initTech) PS.initTech($('#tech3d'));
+PS.whenIdle(function(){ if(PS.initRebarHero) PS.initRebarHero($('#hero3d')); });
+if(PS.initTech){ var tc=$('#tech3d'), done=false; new IntersectionObserver(function(es){ if(es[0].isIntersecting&&!done){ done=true; PS.initTech(tc); } },{rootMargin:'300px'}).observe(tc); }
 })();

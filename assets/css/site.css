@@ -931,3 +931,9 @@ header.site.scrolled{background:rgba(11,12,14,.95);box-shadow:0 1px 0 rgba(226,1
   #mAdd,#mForm{flex:1 1 40%}
 }
 @media (max-width:760px){ .sr-info small{font-size:10px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;margin:0 auto} .sr-info{min-width:0;flex:1} }
+/* QA fixes */
+.sl-drawer:not(.show){visibility:hidden;transition:visibility 0s .45s}
+.sl-drawer.show{visibility:visible}
+.dser,.scard2 small{color:color-mix(in srgb,var(--sc) 68%,#000)}
+#cWa.disabled{opacity:.45;pointer-events:none}
+@media (max-width:760px){ .dm-close{position:fixed;top:calc(6svh + 12px);right:14px;z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.35)} }
