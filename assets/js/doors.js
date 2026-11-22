@@ -181,7 +181,7 @@ var strip=$('#doorStrip');
 if(strip){
   var pick=['CA-01','CA-05','AL-01','HT-01','CP-01','SM-801','CA-07','AL-03','CP-02','SM-803'];
   var href=strip.getAttribute('data-href')||'steel-doors/';
-  strip.innerHTML=pick.map(function(c){ var d=byCode(c); return '<a class="sd" href="'+href+'#d-'+c+'" style="--sc:'+SERIES[d.s].color+'"><span class="sd-img"><img src="'+d.img+'" alt="'+c+' '+PS.esc(d.name)+'" loading="lazy"></span><b>'+c+'</b><span>'+SERIES[d.s].name+'</span></a>'; }).join('');
+  strip.innerHTML=pick.map(function(c){ var d=byCode(c); return '<a class="sd" href="'+href+'#d-'+c+'" style="--sc:'+SERIES[d.s].color+'"><span class="sd-img"><img src="'+d.img+'" alt="'+c+' '+PS.esc(d.name)+'" loading="lazy"></span><b>'+c+'</b><span>'+PS.esc(d.name)+'</span><span style="color:'+SERIES[d.s].color+';font-weight:700;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase">'+SERIES[d.s].name+'</span></a>'; }).join('');
 }
 /* deep link #d-CODE */
 if(modal && /^#d-/.test(location.hash)){ var c=decodeURIComponent(location.hash.slice(3)); setTimeout(function(){ openModal(c) },700); }

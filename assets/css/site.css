@@ -296,7 +296,7 @@ section{position:relative}
 /* ---------- CTA band ---------- */
 .band{padding:0 0 120px;background:var(--paper)}
 .band-in{border-radius:32px;padding:64px;background:radial-gradient(600px 300px at 85% 20%,rgba(255,255,255,.35),transparent 60%),linear-gradient(120deg,var(--gold-deep),var(--gold) 45%,var(--gold-2));color:#1a1205;display:flex;align-items:center;justify-content:space-between;gap:30px;position:relative;overflow:hidden}
-.band-in::before{content:"";position:absolute;right:-60px;bottom:-80px;width:320px;height:320px;background:url("__EMBLEM__") center/contain no-repeat;opacity:.16;filter:brightness(0);transform:rotate(-12deg)}
+.band-in::before{content:"";position:absolute;right:-60px;bottom:-80px;width:320px;height:320px;background:url("../img/emblem.webp") center/contain no-repeat;opacity:.16;filter:brightness(0);transform:rotate(-12deg)}
 .band-in h2{font-size:clamp(30px,3.6vw,48px);max-width:620px}
 .band-in p{margin-top:10px;font-size:17px;max-width:560px;color:#3a2a06}
 .band-in .acts{display:flex;gap:12px;flex-wrap:wrap;position:relative}
@@ -772,3 +772,42 @@ html.modal-open{overflow:hidden}
   .stat{padding:16px 18px}
 }
 .cat-search input{min-width:0}
+
+/* ===== design review fixes ===== */
+.gold-text{animation-duration:12s}
+:is(.cream,.sec:not(.dark):not(.contact):not(.tech):not(.brands)) .gold-text{background-image:linear-gradient(100deg,#7a5606,#a87a0c 35%,#d9a63a 50%,#a87a0c 65%,#7a5606)}
+header.site.scrolled{background:rgba(11,12,14,.95);box-shadow:0 1px 0 rgba(226,181,74,.18)}
+.menu a.active{background:none;color:var(--gold-2)}
+.menu a.cur.active{background:rgba(226,181,74,.14)}
+.hero:not(.home-hero)::before{background-image:linear-gradient(90deg,rgba(11,12,14,.9) 0,rgba(11,12,14,.65) 36%,transparent 62%),linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:auto,64px 64px,64px 64px;mask-image:none;-webkit-mask-image:none}
+.sd-img{overflow:hidden}
+.sd-img img{height:auto;max-height:88%;max-width:80%;object-fit:contain}
+.strip-wrap{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.sd b{font-size:14.5px;line-height:1.3}
+.contact .sec-head p{color:var(--muted-d)}
+.sr-ui{bottom:16px}
+/* pinned hero: the door opens while you stay on it */
+@media (min-width:900px){
+  .hero-pin{height:230vh;position:relative}
+  .hero-pin>.home-hero{position:sticky;top:0;height:100vh;height:100svh;min-height:0}
+  body.ready .hero-pin .hero-copy,body.ready .hero-pin .hero-stats,body.ready .hero-pin .scroll-cue{opacity:calc(1 - var(--sp,0)*1.8);transition:opacity .1s linear}
+  .hero-pin .hero-copy{transform:translateY(calc(var(--sp,0)*-60px))}
+  body:not(.ready) .hero-pin .hero-copy{transform:none}
+}
+@media (max-width:760px){
+  .home-hero #hero3d{opacity:.3}
+  .hero p.lead{font-size:15px}
+  .stat b{font-size:20px}
+}
+@media (max-width:480px){
+  .dmeta{flex-direction:column;align-items:flex-start;gap:2px}
+  .dcard h4{font-size:15px}
+  .dsz span{font-size:11px;padding:3px 8px}
+  .dacts{flex-direction:row}
+  .sl-add{flex:0 0 44px!important}
+  .sl-add span{display:none}
+  .cat-bar{position:static}
+  .totop{display:none}
+  .dm-stage{min-height:0;height:42svh}
+  .dm-acts{position:sticky;bottom:0;background:#fff;padding-top:10px}
+}

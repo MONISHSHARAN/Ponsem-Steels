@@ -82,7 +82,7 @@ PS.initDoorHero = function(canvas, opts){
   var scene=new T.Scene(); scene.environment=makeEnv(renderer,true); scene.fog=new T.Fog(0x0b0c0e,12,26);
   var cam=new T.PerspectiveCamera(30,1,0.1,200); cam.position.set(0,0.2,13);
   scene.add(new T.AmbientLight(0x3a3f48,0.55));
-  var key=new T.DirectionalLight(0xffe2b0,1.15); key.position.set(-4,6,9); scene.add(key);
+  renderer.toneMappingExposure=.92; var key=new T.DirectionalLight(0xffe2b0,0.8); key.position.set(-4,6,9); scene.add(key);
   var rim=new T.DirectionalLight(0xe2b54a,0.9); rim.position.set(6,3,-4); scene.add(rim);
 
   var rig=new T.Group(); scene.add(rig);
@@ -97,11 +97,11 @@ PS.initDoorHero = function(canvas, opts){
   var lR=makeSlab(tex,leafW,H,d,uR,0x8a6a3c); lR.position.x=-leafW/2; pivR.add(lR);
   rig.add(pivL,pivR);
   // frame
-  var fm=steelMat(0xc9a066,0.3), fw=0.16, fd=0.34;
+  var fm=new T.MeshStandardMaterial({color:0xa87a22,metalness:1,roughness:.22,envMapIntensity:1.3}), fw=0.16, fd=0.34;
   var top=new T.Mesh(new T.BoxGeometry(W+fw*2,fw,fd),fm); top.position.set(0,H/2+fw/2,-0.06);
   var lf=new T.Mesh(new T.BoxGeometry(fw,H+fw*2,fd),fm); lf.position.set(-W/2-fw/2,0,-0.06);
   var rf=lf.clone(); rf.position.x=W/2+fw/2;
-  var sill=new T.Mesh(new T.BoxGeometry(W+fw*2+0.3,0.08,0.7),steelMat(0x2a2c31,0.5)); sill.position.set(0,-H/2-0.04,0.15);
+  var sill=new T.Mesh(new T.BoxGeometry(W+fw*2+0.3,0.08,0.7),fm); sill.position.set(0,-H/2-0.04,0.15);
   rig.add(top,lf,rf,sill);
   // portal glow behind
   var portalC=document.createElement('canvas'); portalC.width=256; portalC.height=512; var px=portalC.getContext('2d');
@@ -138,7 +138,9 @@ PS.initDoorHero = function(canvas, opts){
     var dt=Math.min(clock.getDelta(),0.05), t=clock.elapsedTime;
     if(visible()){
       intro=Math.min(1,intro+dt*0.45);
-      var sp=Math.min(1, Math.max(0, window.scrollY/(host.clientHeight*0.75)));
+      var pin=host.parentElement, pinned=pin&&pin.classList.contains('hero-pin')&&getComputedStyle(host).position==='sticky';
+      var sp=pinned? Math.min(1,Math.max(0,-pin.getBoundingClientRect().top/Math.max(1,pin.offsetHeight-innerHeight))) : Math.min(1, Math.max(0, window.scrollY/(host.clientHeight*0.75)));
+      if(pinned) pin.style.setProperty('--sp',sp.toFixed(3));
       var teaser=0.16*(1-Math.pow(1-Math.max(0,(intro-0.25)/0.75),3)) + Math.sin(t*1.1)*0.012*intro;
       var target=reduce?0.55:Math.max(teaser, sp*1.05);
       open+=(target-open)*Math.min(1,dt*4);
@@ -150,7 +152,7 @@ PS.initDoorHero = function(canvas, opts){
       rebars.rotation.y=Math.sin(t*0.3)*0.15;
       mx+=(tx-mx)*0.05; my+=(ty-my)*0.05;
       rig.rotation.y=-0.32*(mobile?0.3:1)+mx*0.18; rig.rotation.x=my*0.06;
-      cam.position.z=13-sp*2.2; cam.position.y=0.2-my*0.4; cam.lookAt(rig.position.x*0.35,0,0);
+      var k=pinned?Math.pow(Math.max(0,sp-0.3)/0.7,1.4):0; cam.position.z=13-(pinned?k*6.4:sp*2.2); cam.position.x=rig.position.x*k*0.92; cam.position.y=0.2-my*0.4*(1-k); cam.lookAt(rig.position.x*(0.35+0.65*k),0,0); rig.rotation.y*= (1-k*0.85);
       dust(dt*0.25,t);
       renderer.render(scene,cam);
     }
@@ -175,10 +177,10 @@ PS.initRebarHero = function(canvas){
   [-5,0,5].forEach(function(y){ var w=new T.Mesh(new T.TorusGeometry(2.25,0.06,8,48), wireMat); w.rotation.x=Math.PI/2; w.position.y=y; w.scale.set(1,0.62,1); bundle.add(w); });
   rig.rotation.set(0.25,0,-0.95);
   var floaters=[];
-  [[-16,-11,-22,0.35,0.6],[14,-8,-14,0.4,-0.4],[20,1,-26,0.3,1.1],[-24,-2,-36,0.45,0.2]].forEach(function(f,i){ var b=makeRebar(9+i*2,f[3],mat); b.position.set(f[0],f[1],f[2]); b.rotation.set(f[4],0.3,f[4]*1.4); scene.add(b); floaters.push({o:b,y:f[1],s:0.4+i*0.15}); });
+  [[-28,-11,-22,0.35,0.6],[14,-8,-14,0.4,-0.4],[20,1,-26,0.3,1.1],[-24,-2,-36,0.45,0.2]].forEach(function(f,i){ var b=makeRebar(9+i*2,f[3],mat); b.position.set(f[0],f[1],f[2]); b.rotation.set(f[4],0.3,f[4]*1.4); scene.add(b); floaters.push({o:b,y:f[1],s:0.4+i*0.15}); });
   var sp=sparks(scene,380,[44,28,20,-4],0.22);
   var mobile=false;
-  fit(renderer,cam,host,function(w){ mobile=w<760; rig.position.set(mobile?0:(w<1100?3.2:6.2), mobile?-1.5:0.2, mobile?-9:0); });
+  fit(renderer,cam,host,function(w){ mobile=w<760; rig.position.set(mobile?0:(w<1100?4:7.6), mobile?-1.5:0.2, mobile?-9:0); });
   var mx=0,my=0,tx=0,ty=0; addEventListener('pointermove',function(e){tx=(e.clientX/innerWidth-.5);ty=(e.clientY/innerHeight-.5)},{passive:true});
   var visible=onVisible(host,function(){}), clock=new T.Clock(), intro=0;
   function frame(){ var dt=Math.min(clock.getDelta(),0.05), t=clock.elapsedTime;
@@ -220,12 +222,12 @@ PS.initShowroom = function(canvas, doors, opts){
   if(!canvas||!doors||!doors.length) return null; opts=opts||{};
   var host=canvas.parentElement, renderer=makeRenderer(canvas);
   var scene=new T.Scene(); scene.environment=makeEnv(renderer,true);
-  scene.fog=new T.Fog(0x0d0e11, 9, 19);
+  scene.fog=new T.Fog(0x0d0e11, 7, 15);
   var cam=new T.PerspectiveCamera(34,1,0.1,100);
   scene.add(new T.AmbientLight(0x50555e,0.6));
   var key=new T.DirectionalLight(0xfff0d6,0.9); key.position.set(0,6,10); scene.add(key);
-  var spot=new T.SpotLight(0xffd690,2.2,20,0.42,0.6,1.4); scene.add(spot); scene.add(spot.target);
-  var N=doors.length, R=Math.max(3.6, N*0.42), step=Math.PI*2/N, H=2.5;
+  renderer.toneMappingExposure=.88; var spot=new T.SpotLight(0xffd690,1.3,20,0.42,0.6,1.4); scene.add(spot); scene.add(spot.target);
+  var N=doors.length, R=Math.max(3.6, N*0.42), step=Math.PI*2/N, H=2.25;
   var ring=new T.Group(); scene.add(ring);
   var items=[];
   doors.forEach(function(dr,i){
@@ -241,7 +243,7 @@ PS.initShowroom = function(canvas, doors, opts){
     var pl=new T.Mesh(new T.BoxGeometry(w+0.3,0.06,0.5), steelMat(0x2c2a27,0.45)); pl.position.y=-0.03; holder.add(pl);
     slab.userData.index=i; ring.add(holder); items.push({holder:holder, slab:slab, data:dr});
   });
-  var floor=new T.Mesh(new T.CircleGeometry(R+6,64), new T.MeshStandardMaterial({color:0x08090b, metalness:.3, roughness:.6, envMapIntensity:.15, transparent:true, opacity:.9}));
+  var floor=new T.Mesh(new T.CircleGeometry(R+30,64), new T.MeshStandardMaterial({color:0x050607, metalness:.75, roughness:.32, envMapIntensity:.25}));
   floor.rotation.x=-Math.PI/2; floor.position.y=-0.065; scene.add(floor);
   var halo=new T.Mesh(new T.PlaneGeometry(4,4), new T.MeshBasicMaterial({map:glowTex([[0,'rgba(255,215,140,.6)'],[.5,'rgba(255,190,80,.18)'],[1,'rgba(255,170,40,0)']]), transparent:true, depthWrite:false, blending:T.AdditiveBlending}));
   halo.rotation.x=-Math.PI/2; halo.position.set(0,-0.05,R+0.4); scene.add(halo);
